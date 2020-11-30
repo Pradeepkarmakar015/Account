@@ -1,0 +1,122 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package arithmetic;
+
+import java.util.*;
+import java.io.*;
+
+/**
+ *
+ * @author Pradeep
+ */
+
+class Account1 implements Serializable {
+
+    String accno;
+    String name;
+    double balance;
+
+    public Account1() {
+    }
+
+    public Account1(String accno, String name, double balance) {
+        this.accno = accno;
+        this.name = name;
+        this.balance = balance;
+    }
+
+    @Override
+    public String toString() {
+        return "Account no " + accno + "\nName: " + name + "\nBalance: " + balance;
+    }
+}
+
+public class AccountChallenge {
+
+    public static void main(String[] args) throws Exception {
+        Scanner sc = new Scanner(System.in);
+
+        Account1 acc = null;
+        HashMap<String, Account1> hm = new HashMap<>();
+
+        try {
+            FileInputStream fis = new FileInputStream("C:/Myjava/Account1.txt");
+            ObjectInputStream ois = new ObjectInputStream(fis);
+
+            int count = (int) ois.readObject();
+            for (int i = 0; i < count; i++) {
+                acc = (Account1) ois.readObject();
+                System.out.println(acc);
+                hm.put(acc.accno, acc);
+            }
+
+            fis.close();
+            ois.close();
+
+        } catch (IOException | ClassNotFoundException e) {
+        }
+
+        FileOutputStream fos = new FileOutputStream("C:/Myjava/Account1.txt");
+        ObjectOutputStream oos = new ObjectOutputStream(fos);
+
+        System.out.println("Menu");
+        int choice;
+        String accno, name;
+        double balance;
+
+        do {
+            System.out.println("1. Create Account");
+            System.out.println("2. Delete Account");
+            System.out.println("3. View Account");
+            System.out.println("4. View All Accounts");
+            System.out.println("5. Save Accounts");
+            System.out.println(". Exit");
+            System.out.println("Enter your choice");
+            choice = sc.nextInt();
+            sc.skip("(\r\n|[\n\r\u2028\u2029\u0085])?");
+
+            switch (choice) {
+                case 1:
+                    System.out.println("Enter Details Accno, Name , balance");
+                    accno = sc.nextLine();
+                    name = sc.nextLine();
+                    balance = sc.nextDouble();
+                    acc = new Account1(accno, name, balance);
+                    hm.put(accno, acc);
+                    System.out.println("Accounted Created for " + name);
+
+                    break;
+                case 2:
+                    System.out.println("Enter Accno");
+
+                    accno = sc.nextLine();
+                    hm.remove(accno);
+                    break;
+                case 3:
+                    System.out.println("Enter Accno");
+                    accno = sc.nextLine();
+                    acc = hm.get(accno);
+                    System.out.println(acc);
+                    break;
+                case 4:
+                    for (Account1 a : hm.values()) {
+                        System.out.println(a);
+                    }
+                    break;
+                case 5:
+                case 6:
+                    oos.write(hm.size());
+
+                    for (Account1 a : hm.values()) {
+                        oos.writeObject(a);
+                    }
+            }
+        } while (choice != 6);
+        oos.flush();
+        oos.close();
+        fos.close();
+    }
+}
